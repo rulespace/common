@@ -14,8 +14,53 @@ export function assertFalse(x)
   }
 }
 
+// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+function sfc32(a, b, c, d)
+{
+  return function()
+  {
+    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; 
+    let t = (a + b) | 0;
+    a = b ^ b >>> 9;
+    b = c + (c << 3) | 0;
+    c = (c << 21 | c >>> 11);
+    d = d + 1 | 0;
+    t = t + d | 0;
+    c = c + t | 0;
+    return (t >>> 0) / 4294967296;
+  }
+}
+
+export function createRandom(seed = 1337 ^ 0xDEADBEEF)
+{
+  return sfc32(0x9E3779B9, 0x243F6A88, 0xB7E15162, seed);
+}
+
 export const Arrays =
 {
+  // equals(x, y) // atom, array
+  // {
+  //   if (x.length !== y.length)
+  //   {
+  //     return false;
+  //   }
+  //   for (let i = 0; i < x.length; i++)
+  //   {
+  //     if (x[i] === y[i])
+  //     {
+  //       return true;
+  //     }
+  //     if (Array.isArray(x[i]))
+  //     {
+  //       if (Array.isArray(y[i]))
+  //       {
+  //         return Arrays.equals(x[i], y[i]);
+  //       }
+  //     }
+  //     return false;      
+  //   }
+  //   return true;
+  // },
 
   push(array, x)
   {
@@ -30,6 +75,45 @@ export const Arrays =
   }
 
 }
+
+// export class ArrayRegistry
+// {
+//   constructor()
+//   {
+//     this.arrays = [];
+//   }
+
+//   addGet(a)
+//   {
+//     outer: for (let i = 0; i < this.arrays.length; i++)
+//     {
+//       const x = this.arrays[i];
+//       if (x === a)
+//       {
+//         return x;
+//       }
+//       if (x.length !== a.length)
+//       {
+//         continue;
+//       }
+//       for (let j = 0; j < x.length; j++)
+//       {
+//         if (x[j] !== a[j])
+//         {
+//           continue outer;
+//         }
+//       }
+//       return x;
+//     }
+//     this.arrays.push(a);
+//     return a;
+//   }
+
+//   values()
+//   {
+//     return this.arrays.values();  
+//   }
+// }
 
 export const MutableArrays =
 {
@@ -111,6 +195,24 @@ export const MutableSets =
 
 export const Maps =
 {
+  // fromMergedEntries(entries, mergeFun)
+  // {
+  //   const m = new Map();
+  //   for ([key, value] of entries)
+  //   {
+  //     const current = m.get(key);
+  //     if (current === undefined)
+  //     {
+  //       m.set(key, value);
+  //     }
+  //     else
+  //     {
+  //       m.set(key, mergeFun(current, value));
+  //     }
+  //   }
+  //   return m;
+  // },
+
   put(map, key, value)
   {
     const map2 = new Map(map);
@@ -147,6 +249,7 @@ export const MutableMaps =
       current.add(value);
     }
   }
+
 }
 
 export const Strings = {};
@@ -194,3 +297,8 @@ Characters.isDigit =
     return x === "0" || x === "1" || x === "2" || x === "3" || x === "4" || x === "5" || x === "6" || x === "7" || x === "8" || x === "9";
   }
 
+
+  // const r = new ArrayRegistry();
+  // const a1 = r.addGet(['hey' , r.addGet(['ho', 123])]);
+  // const a2 = r.addGet(['hey' , r.addGet(['ho', 123])]);
+  // console.log(a1 === a2);
